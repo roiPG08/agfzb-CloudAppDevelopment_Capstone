@@ -15,6 +15,25 @@ logger = logging.getLogger(__name__)
 
 
 # Create your views here.
+# Add a class-based course list view
+#class CourseListView(generic.ListView):
+#    template_name = 'djangoapp/index.html'
+#    context_object_name = 'index'
+
+def index(request):
+    context = {}
+    if request.method == 'GET':
+        return render(request, 'djangoapp/index.html', context)
+
+def about(request):
+    context = {}
+    if request.method == 'GET':
+        return render(request, 'djangoapp/about.html', context)
+
+def contact_us(request):
+    context = {}
+    if request.method == 'GET':
+        return render(request, 'djangoapp/contact.html', context)
 
 
 # Create an `about` view to render a static about page
