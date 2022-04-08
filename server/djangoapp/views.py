@@ -1,5 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
+from django.template.loader import render_to_string
+from requests.api import get, post
+from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, get_dealersby_state
+from .models import CarMake, CarModel, CarDealer, DealerReview
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related models
@@ -12,17 +16,6 @@ import json
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
-
-def get_dealerships(request):
-    """ Dealerships View """
-    if request.method == "GET":
-        context = {}
-        url = "	https://38f61a2f.eu-gb.apigw.appdomain.cloud/dealership"
-        dealerships = get_dealerships_from_cf(url)
-        context = {"dealerships": dealerships}
-        get_dealerships_view = render(request, 'djangoapp/index.html', context)
-    return get_dealerships_view
-
 
 def login_request(request):
     context = {}
@@ -39,11 +32,9 @@ def login_request(request):
     else:
         return render(request, 'djangoapp/user_login.html', context)
 
-
 def logout_request(request):
     logout(request)
     return redirect('djangoapp:index')
-
 
 def registration_request(request):
     context = {}
@@ -96,17 +87,33 @@ def contact_us(request):
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 # ...
-def get_dealer_details(request, dealer_id, dealer_name):
+
+def get_dealerships(request):
+    if request.method == "GET":
+        context = {}
+        url = "https://38f61a2f.eu-gb.apigw.appdomain.cloud/api/dealership"
+        dealerships = get_dealers_from_cf(url)
+        context["dealerships_list"] = dealerships
+        #context = {"dealerships": dealerships}
+    return render(request, 'djangoapp/index.html', context)
+
+def get_dealer_details(request, dealer_id):
     """ Dealerships Details """
     if request.method == "GET":
         context = {}
-        dealer_url = "	https://38f61a2f.eu-gb.apigw.appdomain.cloud/dealership"
+        dealer_url = "https://38f61a2f.eu-gb.apigw.appdomain.cloud/api/dealership"
+        dealer_details = get_dealer_by_id_from_cf(dealer_url, dealer_id)
+        # context = {
+        #     "dealer_id": dealer_id,
+        #     "full_name": full_name,
+        #     "reviews": dealer_reviews
+        # }
+        context["dealer"] = dealer
+
+        reviews_url = "https://38f61a2f.eu-gb.apigw.appdomain.cloud/api/reviews"
         dealer_reviews = get_dealer_reviews_from_cf(dealer_url,dealer_id)
-        context = {
-            "dealer_id": dealer_id,
-            "full_name": full_name,
-            "reviews": dealer_reviews
-        }
+        print(dealer_reviews)
+        context["dealer_reviews"] = dealer_reviews
         dealer_details_view = render(
             request, 'djangoapp/dealer_details.html', context)
 
@@ -118,6 +125,8 @@ def get_dealer_details(request, dealer_id, dealer_name):
 
 def add_dealer_review(request, dealer_id, dealer_name):
     """ Add Review View """
+    context = {}
+    dealer_url = "https://38f61a2f.eu-gb.apigw.appdomain.cloud/api/dealership"
     if request.method == "GET":
         cars = CarModel.objects.filter(dealer_id=dealer_id)
         context = {"cars": cars, "dealer_id": dealer_id,

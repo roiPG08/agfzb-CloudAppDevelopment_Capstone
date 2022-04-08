@@ -15,7 +15,9 @@ urlpatterns = [
     # path for contact us view
     path(route='contact', view=views.contact_us, name='contact_us'),
     # path for a specific dealer, taken by dealer id
-    path('dealer/<int:dealer_id>/', views.get_dealer_details, name='dealer_details'),
+    path(route='dealer/<int:dealer_id>/', view=views.get_dealer_details, name='dealer_details'),
+    # path to add for specific dealer a review
+    path(route='dealer/<int:dealer_id>/review', view=views.add_dealer_review, name='add_review'),
 
     # route is a string contains a URL pattern
     # view refers to the view function
