@@ -16,7 +16,9 @@ logger = logging.getLogger(__name__)
 def get_dealerships(request):
     """ Dealerships View """
     if request.method == "GET":
-        dealerships = get_dealerships_from_cf()
+        context = {}
+        url = "	https://38f61a2f.eu-gb.apigw.appdomain.cloud/dealership"
+        dealerships = get_dealerships_from_cf(url)
         context = {"dealerships": dealerships}
         get_dealerships_view = render(request, 'djangoapp/index.html', context)
     return get_dealerships_view
@@ -78,11 +80,13 @@ def contact_us(request):
     if request.method == 'GET':
         return render(request, 'djangoapp/contact.html', context)
 
-# Update the `get_dealerships` view to render the index page with a list of dealerships
-def get_dealerships(request):
-    context = {}
-    if request.method == "GET":
-        return render(request, 'djangoapp/index.html', context)
+# # Update the `get_dealerships` view to render the index page with a list of dealerships
+# def get_dealerships(request):
+#     context = {}
+#     if request.method == "GET":
+#         context = {}
+#         url = ""
+#         return render(request, 'djangoapp/index.html', context)
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
@@ -95,7 +99,9 @@ def get_dealerships(request):
 def get_dealer_details(request, dealer_id, dealer_name):
     """ Dealerships Details """
     if request.method == "GET":
-        dealer_reviews = get_dealer_reviews_from_cf(dealer_id)
+        context = {}
+        dealer_url = "	https://38f61a2f.eu-gb.apigw.appdomain.cloud/dealership"
+        dealer_reviews = get_dealer_reviews_from_cf(dealer_url,dealer_id)
         context = {
             "dealer_id": dealer_id,
             "full_name": full_name,
@@ -103,6 +109,8 @@ def get_dealer_details(request, dealer_id, dealer_name):
         }
         dealer_details_view = render(
             request, 'djangoapp/dealer_details.html', context)
+
+        # ADd here endpoint for dealer reviews! and details!
     return dealer_details_view
 
 # Create a `add_review` view to submit a review
